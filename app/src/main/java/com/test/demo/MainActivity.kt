@@ -10,13 +10,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     private val numberAdapter by lazy {
-        NumberAdapter(items)
+        NumberAdapter()
     }
 
     private val items = mutableListOf<NumberAdapter.Item>()
-
     private val maxCount = 10
-
+    private var isSwapped = false
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -33,6 +33,8 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
+        numberAdapter.submitList(items.toList())
+
         with (binding.rvNumber) {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = numberAdapter
@@ -41,16 +43,27 @@ class MainActivity : AppCompatActivity() {
         binding.bNext.setOnClickListener {
             val selectedIndex = items.indexOfFirst { it.isSelected }
 
-            if (selectedIndex == items.lastIndex) {
-                items[selectedIndex] = items[selectedIndex].copy(
-                    isSelected = false
-                )
-                items[0] = items[0].copy(
-                    isSelected = true
-                )
+            if (selectedIndex == 0) {
+                isSwapped = false
+            }
 
-                numberAdapter.notifyItemChanged(selectedIndex)
-                numberAdapter.notifyItemChanged(0)
+            if (selectedIndex == items.lastIndex) {
+                if (!isSwapped) {
+                    items[selectedIndex] = items[selectedIndex].copy(
+                        isSelected = false
+                    )
+                    items[0] = items[0].copy(
+                        isSelected = false
+                    )
+                } else {
+                    items[selectedIndex] = items[selectedIndex].copy(
+                        isSelected = false
+                    )
+                    items[0] = items[0].copy(
+                        isSelected = true
+                    )
+                }
+
             } else {
                 val currentNumber = items[selectedIndex].number
                 val nextNumber = items[selectedIndex + 1].number
@@ -58,7 +71,7 @@ class MainActivity : AppCompatActivity() {
                 when {
                     currentNumber > nextNumber -> {
                         Collections.swap(items, selectedIndex, selectedIndex + 1)
-                        numberAdapter.notifyItemMoved(selectedIndex, selectedIndex+1)
+                        isSwapped = true
                     }
                     else -> {
                         items[selectedIndex] = items[selectedIndex].copy(
@@ -67,11 +80,15 @@ class MainActivity : AppCompatActivity() {
                         items[selectedIndex + 1] = items[selectedIndex + 1].copy(
                             isSelected = true
                         )
-
-                        numberAdapter.notifyItemRangeChanged(selectedIndex, 2)
                     }
                 }
             }
+
+            updateAdapter()
         }
+    }
+
+    private fun updateAdapter() {
+        numberAdapter.submitList(items.toList())
     }
 }
