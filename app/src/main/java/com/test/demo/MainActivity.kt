@@ -67,9 +67,10 @@ class MainActivity : AppCompatActivity() {
                         items[selectedIndex + 1] = items[selectedIndex + 1].copy(
                             isSelected = true
                         )
+
+                        numberAdapter.notifyItemRangeChanged(selectedIndex, 2)
                     }
                 }
-                numberAdapter.notifyItemRangeChanged(selectedIndex, 2)
             }
         }
     }
