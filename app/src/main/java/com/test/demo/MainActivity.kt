@@ -43,6 +43,11 @@ class MainActivity : AppCompatActivity() {
         binding.bNext.setOnClickListener {
             val selectedIndex = items.indexOfFirst { it.isSelected }
 
+            if (selectedIndex == -1) {
+                binding.bNext.isEnabled = false
+                return@setOnClickListener
+            }
+
             if (selectedIndex == 0) {
                 isSwapped = false
             }
